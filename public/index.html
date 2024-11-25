@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animal Pictures</title>
+</head>
+<body>
+    <h1>Animal Pictures Search App</h1>
+    
+    <div>
+        <select id="animalType">
+            <option value="cat">Cat</option>
+            <option value="dog">Dog</option>
+            <option value="bear">Bear</option>
+        </select>
+        
+        <input type="number" id="pictureCount" min="1" max="10" value="1">
+        
+        <button onclick="savePicture()">Save Pictures</button>
+        <button onclick="getLastPicture()">Get Last Picture</button>
+        <button onclick="getAllPictures()">Show All Pictures</button>
+    </div>
+
+    <div id="status"></div>
+    <div id="imageContainer"></div>
+
+    <script>
+        function showStatus(message) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            console.log(message); // console logging for debugging
+        }
+
+        async function savePicture() {
+            const animalType = document.getElementById('animalType').value;
+            const count = parseInt(document.getElementById('pictureCount').value) || 1;
+            
+            showStatus('Saving picture...');
+            
+            try {
+                const response = await fetch('/save-pictures', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        animalType,
+                        count
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.message || 'Failed to save picture');
+                }
+                
+                showStatus('Picture saved successfully!');
+                displayPictures(data);
+            } catch (error) {
+                showStatus('Error: ' + error.message);
+                console.error('Save error:', error);
+            }
+        }
+
+        async function getLastPicture() {
+            const animalType = document.getElementById('animalType').value;
+            
+            showStatus('Fetching last picture...');
+            
+            try {
+                const response = await fetch(`/last-picture/${animalType}`);
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.message || 'Failed to fetch picture');
+                }
+                
+                showStatus('Last picture retrieved!');
+                displayPictures([data]);
+            } catch (error) {
+                showStatus('Error: ' + error.message);
+                console.error('Fetch error:', error);
+            }
+        }
+
+        async function getAllPictures() {
+            const animalType = document.getElementById('animalType').value;
+            
+            showStatus('Fetching all pictures...');
+            
+            try {
+                const response = await fetch(`/all-pictures/${animalType}`);
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.message || 'Failed to fetch pictures');
+                }
+                
+                showStatus(`Found ${data.length} pictures!`);
+                displayPictures(data);
+            } catch (error) {
+                showStatus('Error: ' + error.message);
+                console.error('Fetch error:', error);
+            }
+        }
+
+        function displayPictures(pictures) {
+            const container = document.getElementById('imageContainer');
+            container.innerHTML = '';
+            
+            if (!Array.isArray(pictures) || pictures.length === 0) {
+                container.innerHTML = '<p>No pictures to display</p>';
+                return;
+            }
+            
+            pictures.forEach(pic => {
+                if (pic && pic.url) {
+                    const img = document.createElement('img');
+                    img.src = pic.url;
+                    img.alt = pic.animalType || 'animal picture';
+                    img.style.maxWidth = '200px';
+                    img.style.margin = '5px';
+                    container.appendChild(img);
+                }
+            });
+        }
+    </script>
+</body>
+</html>
