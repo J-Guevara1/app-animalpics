@@ -2,7 +2,7 @@
 This is an app built with Javascript that pings different APIs to fetch animal pictures based on user choice.
 Baisc UI built with HTML
 
-**#UI Funtionality:**
+# UI Functionality
 Dropdown:
 Select from three different animals (cat, dog, bear)
 
@@ -57,6 +57,7 @@ WSL 2 feature must be enabled
 BIOS-level hardware virtualization enabled
 
 # Run in PowerShell as Administrator
+
 _dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart_
 _dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart_
 
